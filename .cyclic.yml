@@ -1,0 +1,9 @@
+build:
+  steps:
+    - name: Install Dependencies
+      command: npm install
+
+run:
+  steps:
+    - name: Start Server
+      command: npm start
