@@ -5,8 +5,9 @@ const bcrypt = require('bcrypt');
 const app = express();
 const port = process.env.PORT || 3000;
 
-const sequelize = new Sequelize(process.env.DB_NAME || 'todo_db', process.env.DB_USER || 'root', process.env.DB_PASSWORD || '', {
-  host: process.env.DB_HOST || 'localhost',
+// Menggunakan variabel-variabel dari Cyclic
+const sequelize = new Sequelize(process.env.CYCLIC_DB || 'todo_db', '', '', {
+  host: process.env.CYCLIC_URL || 'localhost',
   dialect: 'mysql',
 });
 
@@ -70,7 +71,64 @@ app.get('/todos', async (req, res) => {
   }
 });
 
-// ... (kode CRUD lainnya tetap sama)
+app.get('/todos/:id', async (req, res) => {
+  const todoId = req.params.id;
+  try {
+    const todo = await Todo.findByPk(todoId);
+    if (!todo) {
+      return res.status(404).json({ error: 'Todo not found' });
+    }
+    res.json(todo);
+  } catch (error) {
+    console.error('Error fetching todo:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.put('/todos/:id', async (req, res) => {
+  const todoId = req.params.id;
+  try {
+    const { title, description, completed } = req.body;
+    const todo = await Todo.findByPk(todoId);
+    if (!todo) {
+      return res.status(404).json({ error: 'Todo not found' });
+    }
+    todo.title = title;
+    todo.description = description;
+    todo.completed = completed;
+    await todo.save();
+    res.json(todo);
+  } catch (error) {
+    console.error('Error updating todo:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.delete('/todos/:id', async (req, res) => {
+  const todoId = req.params.id;
+  try {
+    const todo = await Todo.findByPk(todoId);
+    if (!todo) {
+      return res.status(404).json({ error: 'Todo not found' });
+    }
+    await todo.destroy();
+    res.json({ message: 'Todo deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting todo:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.delete('/todos', async (req, res) => {
+  try {
+    // Hapus semua ToDo
+    await Todo.destroy({ where: {} });
+    res.json({ message: 'All todos deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting all todos:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
 
 // Registrasi Endpoint
 app.post('/register', async (req, res) => {
