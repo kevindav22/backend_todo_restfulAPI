@@ -8,7 +8,7 @@ Sesuaikan konfigurasi database dan informasi lainnya di dalam berkas .env. <br>
 Jalankan migrasi untuk membuat tabel di database<br>
 Aplikasi akan berjalan pada http://localhost:3000. <br><br>
 
-3. Endpoints <br>
+3. Endpoints (menggunakan POSTMENT) <br> 
 <b> a. Registrasi Pengguna</b> <br>
 Method: POST <br>
 Endpoint: /register <br>
